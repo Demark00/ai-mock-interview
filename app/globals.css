@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* stylelint-disable-next-line at-rule-no-unknown */
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -263,7 +262,7 @@
   }
 
   .root-layout {
-    @apply flex max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8 mx-auto;
+    @apply flex mx-auto w-full max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
   }
 
   .card-cta {
