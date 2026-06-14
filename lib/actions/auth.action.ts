@@ -1,6 +1,7 @@
 "use server";
 
-import { db, auth } from "@/firebase/admin";
+import { db } from "@/firebase/admin-db";
+import { auth } from "@/firebase/admin-auth";
 import { cookies } from "next/headers";
 
 const COOKIE_TIME = 60 * 60 * 24 * 7 * 1000;
