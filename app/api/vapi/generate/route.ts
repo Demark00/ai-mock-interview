@@ -4,32 +4,43 @@ import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin-db";
 import { getRandomInterviewCover } from "@/lib/utils";
 
-export async function POST(request: Request) {
-  const { type, role, level, techstack, amount, userid } = await request.json();
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+export async function POST(request: Request) {
   try {
-    console.log("API Key Exists:", process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    const { type, role, level, techstack, amount, userid } =
+      await request.json();
+
+    console.log("API Key Exists:", !!process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+
     const { text: questions } = await generateText({
       model: google("gemini-2.5-flash-lite"),
       prompt: `Prepare questions for a job interview.
-        The job role is ${role}.
-        The job experience level is ${level}.
-        The tech stack used in the job is: ${techstack}.
-        The focus between behavioural and technical questions should lean towards: ${type}.
-        The amount of questions required is: ${amount}.
-        Please return only the questions, without any additional text.
-        The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
-        Return the questions formatted like this:
-        ["Question 1", "Question 2", "Question 3"]
-        
-        Thank you! <3
-    `,
+      The job role is ${role}.
+      The job experience level is ${level}.
+      The tech stack used in the job is: ${techstack}.
+      The focus between behavioural and technical questions should lean towards: ${type}.
+      The amount of questions required is: ${amount}.
+      Please return only the questions, without any additional text.
+      Return the questions formatted like this:
+      ["Question 1", "Question 2", "Question 3"]`,
     });
 
     const interview = {
-      role: role,
-      type: type,
-      level: level,
+      role,
+      type,
+      level,
       techstack: techstack.split(","),
       questions: JSON.parse(questions),
       userId: userid,
@@ -40,13 +51,38 @@ export async function POST(request: Request) {
 
     await db.collection("interviews").add(interview);
 
-    return Response.json({ success: true }, { status: 200 });
+    return Response.json(
+      { success: true },
+      {
+        status: 200,
+        headers: corsHeaders,
+      }
+    );
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
+
+    return Response.json(
+      {
+        success: false,
+        error: String(error),
+      },
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
+    );
   }
 }
 
 export async function GET() {
-  return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
+  return Response.json(
+    {
+      success: true,
+      data: "Thank you!",
+    },
+    {
+      status: 200,
+      headers: corsHeaders,
+    }
+  );
 }
