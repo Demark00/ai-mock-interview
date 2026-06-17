@@ -23,19 +23,15 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    console.log(
-      "RAW BODY:",
-      JSON.stringify(body, null, 2)
-    );
+    const args = body?.message?.toolCalls?.[0]?.function?.arguments ?? body;
 
-    const {
-      type,
-      role,
-      level,
-      techstack,
-      amount,
-      userid,
-    } = body;
+    if (!args) {
+      throw new Error("Tool arguments not found");
+    }
+
+    const { type, role, level, techstack, amount, userid } = args;
+
+    console.log("RAW BODY:", JSON.stringify(body, null, 2));
 
     console.log("EXTRACTED VALUES:", {
       role,
@@ -46,14 +42,11 @@ export async function POST(request: Request) {
       userid,
     });
 
-    if (!role)
-      throw new Error(`Missing role. Body: ${JSON.stringify(body)}`);
+    if (!role) throw new Error(`Missing role. Body: ${JSON.stringify(body)}`);
 
-    if (!type)
-      throw new Error(`Missing type. Body: ${JSON.stringify(body)}`);
+    if (!type) throw new Error(`Missing type. Body: ${JSON.stringify(body)}`);
 
-    if (!level)
-      throw new Error(`Missing level. Body: ${JSON.stringify(body)}`);
+    if (!level) throw new Error(`Missing level. Body: ${JSON.stringify(body)}`);
 
     if (!amount)
       throw new Error(`Missing amount. Body: ${JSON.stringify(body)}`);
@@ -61,13 +54,10 @@ export async function POST(request: Request) {
     if (!techstack)
       throw new Error(`Missing techstack. Body: ${JSON.stringify(body)}`);
 
-    console.log(
-      "API Key Exists:",
-      !!process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    );
+    console.log("API Key Exists:", !!process.env.GOOGLE_GENERATIVE_AI_API_KEY);
 
     const { text: questions } = await generateText({
-      model: google("gemini-2.5-flash-lite"),
+      model: google("gemini-2.5-flash"),
       prompt: `
 Prepare questions for a job interview.
 
@@ -92,19 +82,11 @@ Return the questions formatted exactly like:
     try {
       parsedQuestions = JSON.parse(questions);
 
-      console.log(
-        "PARSED QUESTIONS:",
-        parsedQuestions
-      );
+      console.log("PARSED QUESTIONS:", parsedQuestions);
     } catch (parseError) {
-      console.error(
-        "QUESTION PARSE ERROR:",
-        parseError
-      );
+      console.error("QUESTION PARSE ERROR:", parseError);
 
-      throw new Error(
-        `Failed to parse Gemini response: ${questions}`
-      );
+      throw new Error(`Failed to parse Gemini response: ${questions}`);
     }
 
     const interview = {
@@ -119,19 +101,11 @@ Return the questions formatted exactly like:
       createdAt: new Date().toISOString(),
     };
 
-    console.log(
-      "INTERVIEW OBJECT:",
-      JSON.stringify(interview, null, 2)
-    );
+    console.log("INTERVIEW OBJECT:", JSON.stringify(interview, null, 2));
 
-    const docRef = await db
-      .collection("interviews")
-      .add(interview);
+    const docRef = await db.collection("interviews").add(interview);
 
-    console.log(
-      "FIRESTORE DOC CREATED:",
-      docRef.id
-    );
+    console.log("FIRESTORE DOC CREATED:", docRef.id);
 
     console.log("========== SUCCESS ==========");
 
@@ -143,7 +117,7 @@ Return the questions formatted exactly like:
       {
         status: 200,
         headers: corsHeaders,
-      }
+      },
     );
   } catch (error) {
     console.error("========== ERROR ==========");
@@ -152,15 +126,12 @@ Return the questions formatted exactly like:
     return Response.json(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       },
       {
         status: 500,
         headers: corsHeaders,
-      }
+      },
     );
   }
 }
@@ -174,6 +145,6 @@ export async function GET() {
     {
       status: 200,
       headers: corsHeaders,
-    }
+    },
   );
 }
