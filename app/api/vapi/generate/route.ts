@@ -19,11 +19,11 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
   try {
-    console.log("========== VAPI REQUEST START ==========");
-
     const body = await request.json();
 
-    const args = body?.message?.toolCalls?.[0]?.function?.arguments ?? body;
+    // Supports both Vapi and direct API calls
+    const args =
+      body?.message?.toolCalls?.[0]?.function?.arguments ?? body;
 
     if (!args) {
       throw new Error("Tool arguments not found");
@@ -31,69 +31,51 @@ export async function POST(request: Request) {
 
     const { type, role, level, techstack, amount, userid } = args;
 
-    console.log("RAW BODY:", JSON.stringify(body, null, 2));
+    if (!role) throw new Error("Role is required");
+    if (!type) throw new Error("Interview type is required");
+    if (!level) throw new Error("Level is required");
+    if (!amount) throw new Error("Amount is required");
+    if (!techstack) throw new Error("Tech stack is required");
 
-    console.log("EXTRACTED VALUES:", {
-      role,
-      type,
-      level,
-      amount,
-      techstack,
-      userid,
-    });
-
-    if (!role) throw new Error(`Missing role. Body: ${JSON.stringify(body)}`);
-
-    if (!type) throw new Error(`Missing type. Body: ${JSON.stringify(body)}`);
-
-    if (!level) throw new Error(`Missing level. Body: ${JSON.stringify(body)}`);
-
-    if (!amount)
-      throw new Error(`Missing amount. Body: ${JSON.stringify(body)}`);
-
-    if (!techstack)
-      throw new Error(`Missing techstack. Body: ${JSON.stringify(body)}`);
-
-    console.log("API Key Exists:", !!process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-
-    const { text: questions } = await generateText({
+    const { text } = await generateText({
       model: google("gemini-2.5-flash"),
       prompt: `
-Prepare questions for a job interview.
+Prepare interview questions.
 
-The job role is ${role}.
-The job experience level is ${level}.
-The tech stack used in the job is: ${techstack}.
-The focus between behavioural and technical questions should lean towards: ${type}.
-The amount of questions required is: ${amount}.
+Role: ${role}
+Level: ${level}
+Tech Stack: ${techstack}
+Interview Type: ${type}
+Number of Questions: ${amount}
 
-Please return only the questions.
-
-Return the questions formatted exactly like:
-
-["Question 1", "Question 2", "Question 3"]
-      `,
+Rules:
+- Generate exactly ${amount} questions.
+- Return one question per line.
+- Do not return JSON.
+- Do not return markdown.
+- Do not use code blocks.
+- Do not number the questions.
+- Return only the questions.
+`,
     });
 
-    console.log("RAW GEMINI RESPONSE:", questions);
+    const parsedQuestions = text
+      .split("\n")
+      .map((q) => q.trim())
+      .filter(Boolean);
 
-    let parsedQuestions;
-
-    try {
-      parsedQuestions = JSON.parse(questions);
-
-      console.log("PARSED QUESTIONS:", parsedQuestions);
-    } catch (parseError) {
-      console.error("QUESTION PARSE ERROR:", parseError);
-
-      throw new Error(`Failed to parse Gemini response: ${questions}`);
+    if (parsedQuestions.length === 0) {
+      throw new Error("No questions generated");
     }
 
     const interview = {
       role,
       type,
       level,
-      techstack: techstack.split(","),
+      techstack: techstack
+        .split(",")
+        .map((t: string) => t.trim())
+        .filter(Boolean),
       questions: parsedQuestions,
       userId: userid,
       finalized: true,
@@ -101,13 +83,7 @@ Return the questions formatted exactly like:
       createdAt: new Date().toISOString(),
     };
 
-    console.log("INTERVIEW OBJECT:", JSON.stringify(interview, null, 2));
-
     const docRef = await db.collection("interviews").add(interview);
-
-    console.log("FIRESTORE DOC CREATED:", docRef.id);
-
-    console.log("========== SUCCESS ==========");
 
     return Response.json(
       {
@@ -117,11 +93,10 @@ Return the questions formatted exactly like:
       {
         status: 200,
         headers: corsHeaders,
-      },
+      }
     );
   } catch (error) {
-    console.error("========== ERROR ==========");
-    console.error(error);
+    console.error("Interview generation error:", error);
 
     return Response.json(
       {
@@ -131,7 +106,7 @@ Return the questions formatted exactly like:
       {
         status: 500,
         headers: corsHeaders,
-      },
+      }
     );
   }
 }
@@ -145,6 +120,6 @@ export async function GET() {
     {
       status: 200,
       headers: corsHeaders,
-    },
+    }
   );
 }
