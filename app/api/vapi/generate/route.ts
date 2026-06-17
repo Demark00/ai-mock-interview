@@ -19,52 +19,143 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
   try {
-    const { type, role, level, techstack, amount, userid } =
-      await request.json();
+    console.log("========== VAPI REQUEST START ==========");
 
-    console.log("API Key Exists:", !!process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    const body = await request.json();
+
+    console.log(
+      "RAW BODY:",
+      JSON.stringify(body, null, 2)
+    );
+
+    const {
+      type,
+      role,
+      level,
+      techstack,
+      amount,
+      userid,
+    } = body;
+
+    console.log("EXTRACTED VALUES:", {
+      role,
+      type,
+      level,
+      amount,
+      techstack,
+      userid,
+    });
+
+    if (!role)
+      throw new Error(`Missing role. Body: ${JSON.stringify(body)}`);
+
+    if (!type)
+      throw new Error(`Missing type. Body: ${JSON.stringify(body)}`);
+
+    if (!level)
+      throw new Error(`Missing level. Body: ${JSON.stringify(body)}`);
+
+    if (!amount)
+      throw new Error(`Missing amount. Body: ${JSON.stringify(body)}`);
+
+    if (!techstack)
+      throw new Error(`Missing techstack. Body: ${JSON.stringify(body)}`);
+
+    console.log(
+      "API Key Exists:",
+      !!process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    );
 
     const { text: questions } = await generateText({
       model: google("gemini-2.5-flash-lite"),
-      prompt: `Prepare questions for a job interview.
-      The job role is ${role}.
-      The job experience level is ${level}.
-      The tech stack used in the job is: ${techstack}.
-      The focus between behavioural and technical questions should lean towards: ${type}.
-      The amount of questions required is: ${amount}.
-      Please return only the questions, without any additional text.
-      Return the questions formatted like this:
-      ["Question 1", "Question 2", "Question 3"]`,
+      prompt: `
+Prepare questions for a job interview.
+
+The job role is ${role}.
+The job experience level is ${level}.
+The tech stack used in the job is: ${techstack}.
+The focus between behavioural and technical questions should lean towards: ${type}.
+The amount of questions required is: ${amount}.
+
+Please return only the questions.
+
+Return the questions formatted exactly like:
+
+["Question 1", "Question 2", "Question 3"]
+      `,
     });
+
+    console.log("RAW GEMINI RESPONSE:", questions);
+
+    let parsedQuestions;
+
+    try {
+      parsedQuestions = JSON.parse(questions);
+
+      console.log(
+        "PARSED QUESTIONS:",
+        parsedQuestions
+      );
+    } catch (parseError) {
+      console.error(
+        "QUESTION PARSE ERROR:",
+        parseError
+      );
+
+      throw new Error(
+        `Failed to parse Gemini response: ${questions}`
+      );
+    }
 
     const interview = {
       role,
       type,
       level,
       techstack: techstack.split(","),
-      questions: JSON.parse(questions),
+      questions: parsedQuestions,
       userId: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString(),
     };
 
-    await db.collection("interviews").add(interview);
+    console.log(
+      "INTERVIEW OBJECT:",
+      JSON.stringify(interview, null, 2)
+    );
+
+    const docRef = await db
+      .collection("interviews")
+      .add(interview);
+
+    console.log(
+      "FIRESTORE DOC CREATED:",
+      docRef.id
+    );
+
+    console.log("========== SUCCESS ==========");
 
     return Response.json(
-      { success: true },
+      {
+        success: true,
+        interviewId: docRef.id,
+      },
       {
         status: 200,
         headers: corsHeaders,
       }
     );
   } catch (error) {
-    console.error("Error:", error);
+    console.error("========== ERROR ==========");
+    console.error(error);
 
     return Response.json(
       {
         success: false,
-        error: String(error),
+        error:
+          error instanceof Error
+            ? error.message
+            : String(error),
       },
       {
         status: 500,
