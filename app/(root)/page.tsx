@@ -5,10 +5,15 @@ import Link from "next/link";
 import { dummyInterviews } from "@/constants";
 import InterviewCard from "@/components/InterviewCard";
 import {
-  getCurrentUser,
+  getCurrentUser
+} from "@/lib/actions/auth.action";
+
+import {
   getInterviewByUserId,
   getLatestInterviews,
-} from "@/lib/actions/auth.action";
+} from "@/lib/actions/general.action";
+
+
 
 const page = async () => {
   const user = await getCurrentUser();
