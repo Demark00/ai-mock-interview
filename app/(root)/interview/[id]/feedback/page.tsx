@@ -192,7 +192,7 @@ const Page = async ({ params }: RouteParams) => {
 
             <ul className="list-none space-y-3">
               {feedback.strengths.map((strength: string, index: number) => (
-                <li key={index} className="flex items-start gap-3 rounded-xl bg-green-500/10 px-4 py-3">
+                <li key={index} className="flex items-start gap-3 rounded-xl bg-green-500/10 px-4 py-3 items-center">
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-green-400" />
                   <span>{strength}</span>
                 </li>
@@ -207,7 +207,7 @@ const Page = async ({ params }: RouteParams) => {
 
             <ul className="list-none space-y-3">
               {feedback.areasForImprovement.map((area: string, index: number) => (
-                <li key={index} className="flex items-start gap-3 rounded-xl bg-yellow-500/10 px-4 py-3">
+                <li key={index} className="flex items-start gap-3 rounded-xl bg-yellow-500/10 px-4 py-3 items-center">
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-yellow-400" />
                   <span>{area}</span>
                 </li>
