@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PrepWise - AI Mock Interview Platform
 
-## Getting Started
+## Overview
 
-First, run the development server:
+PrepWise is an AI-powered mock interview platform that helps users prepare for technical and behavioral interviews through realistic AI-driven interview sessions. Users can generate customized interviews, interact with an AI interviewer using voice, and receive detailed feedback with performance scores across multiple evaluation categories.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The platform leverages modern web technologies, generative AI, and voice interaction to create an engaging interview preparation experience.
+
+---
+
+## Features
+
+### Authentication
+
+* Secure user authentication using Firebase Authentication
+* User-specific interview sessions
+* Protected routes and personalized dashboard
+
+### AI Interview Generation
+
+* Generate interview questions using Google Gemini AI
+* Customize interviews based on:
+
+  * Job role
+  * Experience level
+  * Interview type
+* Dynamic interview content generation
+
+### Voice-Based Interviews
+
+* Real-time voice conversations using Vapi
+* Speech-to-text transcription
+* AI-powered interviewer responses
+* Interactive interview experience
+
+### AI Feedback System
+
+Receive detailed interview analysis including:
+
+* Overall Interview Score
+* Communication Skills Assessment
+* Technical Knowledge Evaluation
+* Problem Solving Analysis
+* Personalized improvement suggestions
+* Category-wise comments and scores
+
+### Interview Review
+
+* View generated feedback
+* Analyze strengths and weaknesses
+* Track interview performance
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* shadcn/ui
+
+### Backend & Services
+
+* Next.js Server Actions
+* Firebase Authentication
+* Firebase Firestore
+
+### AI & Voice
+
+* Google Gemini AI
+* Vapi AI
+
+### Validation
+
+* Zod
+
+---
+
+## Project Architecture
+
+### Interview Flow
+
+1. User signs in
+2. User creates an interview
+3. Gemini generates interview questions
+4. Vapi starts voice conversation
+5. User answers questions
+6. Responses are collected
+7. Gemini analyzes performance
+8. Structured feedback is generated
+9. Results are displayed to the user
+
+---
+
+## Feedback Structure
+
+Each interview generates:
+
+```json
+{
+  "totalScore": 85,
+  "categoryScores": [
+    {
+      "name": "Communication Skills",
+      "score": 90,
+      "comment": "Clear and confident communication."
+    },
+    {
+      "name": "Technical Knowledge",
+      "score": 80,
+      "comment": "Good understanding of core concepts."
+    },
+    {
+      "name": "Problem Solving",
+      "score": 85,
+      "comment": "Approached problems logically."
+    }
+  ]
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+git clone <repository-url>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+cd prepwise
 
-## Learn More
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+GOOGLE_GENERATIVE_AI_API_KEY=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+NEXT_PUBLIC_VAPI_API_KEY=
+NEXT_PUBLIC_VAPI_ASSISTANT_ID=
+```
+
+---
+
+## Author
+
+Built as an AI-powered interview preparation platform using Next.js, TypeScript, Firebase, Gemini AI, and Vapi AI.
