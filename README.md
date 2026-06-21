@@ -8,6 +8,37 @@ The platform leverages modern web technologies, generative AI, and voice interac
 
 ---
 
+```
+
+## Installation
+
+```bash
+git clone https://github.com/Demark00/ai-mock-interview.git
+
+cd mock_interview
+
+npm install
+
+npm run dev
+```
+
+---
+
+## Environment Variables
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+
+GOOGLE_GENERATIVE_AI_API_KEY=
+
+NEXT_PUBLIC_VAPI_API_KEY=
+NEXT_PUBLIC_VAPI_ASSISTANT_ID=
+```
+
+---
+
 ## Features
 
 ### Authentication
@@ -91,62 +122,6 @@ Receive detailed interview analysis including:
 7. Gemini analyzes performance
 8. Structured feedback is generated
 9. Results are displayed to the user
-
----
-
-## Feedback Structure
-
-Each interview generates:
-
-```json
-{
-  "totalScore": 85,
-  "categoryScores": [
-    {
-      "name": "Communication Skills",
-      "score": 90,
-      "comment": "Clear and confident communication."
-    },
-    {
-      "name": "Technical Knowledge",
-      "score": 80,
-      "comment": "Good understanding of core concepts."
-    },
-    {
-      "name": "Problem Solving",
-      "score": 85,
-      "comment": "Approached problems logically."
-    }
-  ]
-}
-```
-
-## Installation
-
-```bash
-git clone <repository-url>
-
-cd prepwise
-
-npm install
-
-npm run dev
-```
-
----
-
-## Environment Variables
-
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-
-GOOGLE_GENERATIVE_AI_API_KEY=
-
-NEXT_PUBLIC_VAPI_API_KEY=
-NEXT_PUBLIC_VAPI_ASSISTANT_ID=
-```
 
 ---
 
