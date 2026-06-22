@@ -1,8 +1,8 @@
-# PrepWise - AI Mock Interview Platform
+# HirePath - AI Mock Interview Platform
 
 ## Overview
 
-PrepWise is an AI-powered mock interview platform that helps users prepare for technical and behavioral interviews through realistic AI-driven interview sessions. Users can generate customized interviews, interact with an AI interviewer using voice, and receive detailed feedback with performance scores across multiple evaluation categories.
+HirePath is an AI-powered mock interview platform that helps users prepare for technical and behavioral interviews through realistic AI-driven interview sessions. Users can generate customized interviews, interact with an AI interviewer using voice, and receive detailed feedback with performance scores across multiple evaluation categories.
 
 The platform leverages modern web technologies, generative AI, and voice interaction to create an engaging interview preparation experience.
 
